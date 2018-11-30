@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+readonly SCRIPT_NAME="$(basename "$0")"
+readonly VERSION="0.0.1"
+
+bff::usage(){
+  echo ""
+  echo "${SCRIPT_NAME} - A small description of the tool"
+  echo ""
+  echo "usage: ${SCRIPT_NAME} <option>"
+  echo ""
+  echo "  -h | --help           Display this help text"
+  echo "  -v | --version        Displays version of ${SCRIPT_NAME}"
+  echo "  -t | --test VALUE     A test option that also has a value"
+  echo "  -b | --blah VALUE     Another test option that has a value"
+  echo ""
+}
+
+bff::hasValue(){
+  if [[ -z "$1" ]]; then
+    return 1
+  fi
+}
+
+bff::nullValueMsg(){
+  echo "The value for ${1} was null"
+  exit 1
+}
+
+if [[ "$#" -eq 0 ]]; then
+  bff::usage
+  exit 1
+fi
+
+while (( "$#" )); do
+  case "$1" in 
+  -h|--help)
+    bff::usage
+    exit 0
+  ;;
+  -v|--version)
+    echo "$VERSION"
+    exit 0
+  ;;
+  -t|--test)
+    test_value="${2}"
+    if ! bff::hasValue "$test_value"; then
+      bff::nullValueMsg "$1"
+    fi
+    echo "Flag: ${1}"
+    echo "Value: ${test_value}"
+    shift 2
+  ;;
+  -b|--blah)
+    blah_value="$2"
+    echo "Flag: ${1}"
+    echo "Value: ${blah_value}"
+    shift 2
+  ;;
+  *)
+    echo ""
+    echo "Invalid option(s) given"
+    echo ""
+    exit 1
+  ;;
+  esac
+done
